@@ -4,6 +4,7 @@ namespace DevCoding\Device;
 
 use DevCoding\Client\Object\Platform\PlatformImmutable;
 use DevCoding\Client\Object\Version\ClientVersion;
+use DevCoding\Client\Resolver\Platform\LinuxMatcher;
 use DevCoding\Hints\Hint\Arch;
 use DevCoding\Hints\Hint\Bitness;
 use DevCoding\Hints\Hint\PlatformVersion;
@@ -13,7 +14,14 @@ class Platform extends DeviceChild
 {
   public function __toString()
   {
-    return ($obj = $this->getObject()) ? (string) $obj : 'Unknown';
+    if (LinuxMatcher::PLATFORM !== $this->getName())
+    {
+      return ($obj = $this->getObject()) ? (string) $obj : 'Unknown';
+    }
+    else
+    {
+      return $this->getName();
+    }
   }
 
   /**
@@ -39,35 +47,38 @@ class Platform extends DeviceChild
   {
     if ($ver = $this->ClientHints->get(PlatformVersion::HEADER))
     {
-      $obj = new ClientVersion($ver);
-      if ('Windows' === $this->getName())
+      if (!empty($ver))
       {
-        $maj = $obj->getMajor();
-        if ($maj >= 1)
+        $obj = new ClientVersion($ver);
+        if ('Windows' === $this->getName())
         {
-          $real = $maj >= 13 ? 11 : 10;
-          $ver  = preg_replace('#^' . $maj . '#', $real, $ver);
-          $obj  = new ClientVersion($ver);
-        }
-        else
-        {
-          $min = $obj->getMinor();
-          switch($min)
+          $maj = $obj->getMajor();
+          if ($maj >= 1)
           {
-            case 3:
-              $obj = new ClientVersion(8.1);
-              break;
-            case 2:
-              $obj = new ClientVersion(8.0);
-              break;
-            default:
-              $obj = new ClientVersion(7);
-              break;
+            $real = $maj >= 13 ? 11 : 10;
+            $ver  = preg_replace('#^' . $maj . '#', $real, $ver);
+            $obj  = new ClientVersion($ver);
+          }
+          else
+          {
+            $min = $obj->getMinor();
+            switch($min)
+            {
+              case 3:
+                $obj = new ClientVersion(8.1);
+                break;
+              case 2:
+                $obj = new ClientVersion(8.0);
+                break;
+              default:
+                $obj = new ClientVersion(7);
+                break;
+            }
           }
         }
-      }
 
-      return $obj;
+        return $obj;
+      }
     }
 
     return null;
