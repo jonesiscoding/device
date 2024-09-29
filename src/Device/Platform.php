@@ -2,6 +2,15 @@
 
 namespace DevCoding\Device;
 
+/**
+ * Platform.php
+ *
+ * (c) AMJones <am@jonesiscoding.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use DevCoding\Client\Object\Platform\PlatformImmutable;
 use DevCoding\Client\Object\Version\ClientVersion;
 use DevCoding\Client\Resolver\Platform\LinuxMatcher;
@@ -10,8 +19,19 @@ use DevCoding\Hints\Hint\Bitness;
 use DevCoding\Hints\Hint\PlatformVersion;
 use DevCoding\Hints\Hint\Platform as PlatformHint;
 
+/**
+ * Object class representing the platform of a device.
+ *
+ * @author  AMJones <am@jonesiscoding.com
+ * @license https://github.com/jonesiscoding/code-object/blob/main/LICENSE
+ */
 class Platform extends DeviceChild
 {
+  /**
+   * Returns the platform name and version in the format 'Name/1.0'. For Linux devices, only the name is returned.
+   *
+   * @return string
+   */
   public function __toString()
   {
     if (LinuxMatcher::PLATFORM !== $this->getName())
@@ -25,15 +45,21 @@ class Platform extends DeviceChild
   }
 
   /**
-   * @return string|null
+   * Returns the architecture of the device if it can be determined, else a default value.
+   *
+   * @see Arch
+   * @return string
    */
-  public function getArch()
+  public function getArch(): string
   {
     return $this->ClientHints->get(Arch::HEADER);
   }
 
   /**
-   * @return int|string|null
+   * Returns the 'bitness' of the device if it can be determined, else a default value.
+   *
+   * @see Bitness
+   * @return int|string
    */
   public function getBitness()
   {
@@ -41,6 +67,9 @@ class Platform extends DeviceChild
   }
 
   /**
+   * Returns the platform version if it can be determined, else null.
+   *
+   * @see PlatformVersion
    * @return ClientVersion|null
    */
   public function getVersion()
@@ -85,14 +114,18 @@ class Platform extends DeviceChild
   }
 
   /**
+   * Returns the platform name if it can be determined, else a default value.
+   *
    * @return string
    */
-  public function getName()
+  public function getName(): string
   {
     return $this->ClientHints->get(PlatformHint::HEADER);
   }
 
   /**
+   * Returns a PlatformImmutable object to help with string representation of this object.
+   *
    * @return PlatformImmutable
    */
   protected function getObject()

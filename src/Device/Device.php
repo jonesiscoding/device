@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Device.php
+ *
+ * (c) AMJones <am@jonesiscoding.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace DevCoding\Device;
 
 use DevCoding\Helper\Dependency\ServiceBag;
@@ -15,11 +24,10 @@ use DevCoding\Hints\Hint\Model;
 use DevCoding\Hints\Hint\Width;
 
 /**
- * Device.
+ * Object class representing the device making an HTTP(s) request.
  *
- * Class Device
- *
- * @package DevCoding\Device
+ * @author  AMJones <am@jonesiscoding.com
+ * @license https://github.com/jonesiscoding/code-object/blob/main/LICENSE
  */
 class Device
 {
@@ -52,6 +60,10 @@ class Device
   // region //////////////////////////////////////////////// Hardware Getters
 
   /**
+   * Returns the device model name (if available in the 'Sec-CH-UA-Model' header) else a default value.
+   *
+   * @see Model
+   *
    * @return string|null
    */
   public function getModel()
@@ -60,7 +72,11 @@ class Device
   }
 
   /**
-   * @return float|int
+   * Returns a coarse value reflecting the amount of RAM in Gigabytes available to the device (if available in the
+   * 'Device-Memory' header) else a default value.
+   *
+   * @see DeviceMemory
+   * @return float
    */
   public function getDeviceMemory()
   {
@@ -68,7 +84,10 @@ class Device
   }
 
   /**
-   * @return float|int
+   * Returns the DPR of the device (if it can be determined) else a default value.
+   *
+   * @deprecated Use Screen:getDevicePixelRatio
+   * @return float
    */
   public function getDevicePixelRatio()
   {
@@ -76,6 +95,7 @@ class Device
   }
 
   /**
+   * @deprecated Use Connection::getEffectiveConnectionType
    * @return string
    */
   public function getEffectiveConnectionType()
@@ -84,6 +104,7 @@ class Device
   }
 
   /**
+   * @deprecated Use Screen::getHeight
    * @return float|int
    */
   public function getHeight()
@@ -92,6 +113,7 @@ class Device
   }
 
   /**
+   * @deprecated Use Screen::getWidth
    * @return float|int
    */
   public function getWidth()
@@ -104,33 +126,42 @@ class Device
   // region //////////////////////////////////////////////// Subset Getters
 
   /**
+   * Returns an object representing the software used on the device.
+   *
    * @return Client
    */
-  public function Client()
+  public function Client(): Client
   {
     return $this->get(Client::class);
   }
 
   /**
+   * Returns an object representing the screen on the device.  For devices with more than one screen, only the screen
+   * containing the client software at the time of the last request is reflected.
+   *
    * @return Screen
    */
-  public function Screen()
+  public function Screen(): Screen
   {
     return $this->get(Screen::class);
   }
 
   /**
+   * Returns an object representing the platform used on the device.
+   *
    * @return Platform
    */
-  public function Platform()
+  public function Platform(): Platform
   {
     return $this->get(Platform::class);
   }
 
   /**
+   * Returns an object representing the preferences of the user using the device.
+   *
    * @return Preferences
    */
-  public function Preferences()
+  public function Preferences(): Preferences
   {
     return $this->get(Preferences::class);
   }
@@ -173,7 +204,7 @@ class Device
    *
    * @return bool
    */
-  public function isPolyfill()
+  public function isPolyfill(): bool
   {
     $ConfigBag = $this->container->get(ConfigBag::class);
     $required  = $ConfigBag->getRequire();
@@ -200,7 +231,9 @@ class Device
   // region //////////////////////////////////////////////// Helper Methods
 
   /**
-   * @param $id
+   * Returns a service from the service container, instantiating that service as needed.
+   *
+   * @param string $id The fully qualified class name of the service object.
    *
    * @return mixed|object
    */
@@ -210,9 +243,12 @@ class Device
   }
 
   /**
+   * Returns the ClientHints object.  If that object is not present in the service container, it will be created
+   * using the configuration given at instantiation of this device.
+   *
    * @return ClientHints
    */
-  public function getClientHints()
+  public function getClientHints(): ClientHints
   {
     if (!$this->container->has(ClientHints::class))
     {
@@ -235,12 +271,14 @@ class Device
   }
 
   /**
+   * Evaluates if the device has all the features or hint values given in the 'require' key of the configuration.
+   *
    * @param string $key
    * @param mixed $expected
    *
    * @return bool
    */
-  protected function isValid($key, $expected)
+  protected function isValid($key, $expected): bool
   {
     $ClientHints = $this->getClientHints();
     if ($ClientHints->has($key))

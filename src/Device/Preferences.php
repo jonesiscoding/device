@@ -2,6 +2,15 @@
 
 namespace DevCoding\Device;
 
+/**
+ * Preferences.php
+ *
+ * (c) AMJones <am@jonesiscoding.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use DevCoding\Hints\Hint\ColorScheme;
 use DevCoding\Hints\Hint\Contrast;
 use DevCoding\Hints\Hint\DPR;
@@ -13,12 +22,8 @@ use DevCoding\Hints\Hint\SaveData;
 /**
  * Object representing preferences hinted by a device.
  *
- * Class Preferences
- *
- * @see     https://github.com/jonesiscoding/device
  * @author  Aaron M Jones <am@jonesiscoding.com>
  * @licence MIT (https://github.com/jonesiscoding/device/blob/master/LICENSE)
- * @package DevCoding\Device
  */
 class Preferences extends DeviceChild
 {
@@ -35,31 +40,35 @@ class Preferences extends DeviceChild
   /**
    * The user has indicated that they prefer dark mode through a preference on their device.
    *
-   * @deprecated
    * @return bool
    */
-  public function isDarkMode()
+  public function isDarkMode(): bool
   {
-    return ColorScheme::DARK == $this->getColorScheme();
+    return ColorScheme::DARK === $this->getColorScheme();
   }
 
   /**
+   * The user has indicated that they prefer more contrast when viewing content and interfaces on their device.
+   *
    * @return bool
    */
-  public function isIncreasedContrast()
+  public function isIncreasedContrast(): bool
   {
-    return Contrast::MORE == $this->getContrast();
+    return Contrast::MORE === $this->getContrast();
   }
 
   /**
+   * The user has indicated that they prefer less contrast when viewing content and interfaces on their device.
+   *
    * @return bool
    */
-  public function isReducedContrast()
+  public function isReducedContrast(): bool
   {
     return Contrast::LESS == $this->getContrast();
   }
 
   /**
+   * @deprecated Use Preferences::isSaveData for better results.
    * @return bool
    */
   public function isReducedData(): bool
@@ -68,7 +77,8 @@ class Preferences extends DeviceChild
   }
 
   /**
-   * The user has indicated that they prefer reduced motion through a preference on their device or browser.
+   * The user has indicated that they prefer reduced motion through a preference in the client or platform.  This
+   * preference can also be automatically indicated based on device conditions such as being accessed remotely.
    *
    * @return bool
    */
@@ -78,6 +88,8 @@ class Preferences extends DeviceChild
   }
 
   /**
+   * The user has indicated that they prefer reduced motion through a preference in the client or platform.
+   *
    * @return bool
    */
   public function isReducedTransparency(): bool
@@ -87,11 +99,11 @@ class Preferences extends DeviceChild
 
   /**
    * Opinionated check to determine if high resolution responsive images should be served to this device. The device
-   * must not prefer to save data, must have HTMLImageElement.srcset support, and must have a DPR of > 1.
+   * must not indicate a preference to save data, must have HTMLImageElement.srcset support, and must have a DPR of > 1.
    *
    * @return bool
    */
-  public function isHighRes()
+  public function isHighRes(): bool
   {
     $dpr = $this->ClientHints->get(DPR::HEADER);
     $set = $this->ClientHints->bool('HTML_IMG_SRCSET', false);
@@ -100,12 +112,13 @@ class Preferences extends DeviceChild
   }
 
   /**
-   * Opinionated check that Returns TRUE if the client is emitting a truthy official Save-Data header, a legacy header
-   * indicating a mobile connection, an ECT header indicating a 2G / 3G connection, or cookie provided hint of same.
+   * The user, device, or connection provider has indicated a preference or need to save data in responses. This can be
+   * via the official 'Save-Data' header, a legacy header indicating a slower mobile connection, an 'ECT' header which
+   * indicates a 2G or 3G connection, or a cookie value set by device.js indicating any of the same.
    *
    * @return bool
    */
-  public function isSaveData()
+  public function isSaveData(): bool
   {
     return $this->ClientHints->bool(SaveData::HEADER, false);
   }
